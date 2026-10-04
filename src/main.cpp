@@ -1,4 +1,5 @@
 #include "Autorun.h"
+#include "CameraOrbit.h"
 #include "Capture.h"
 #include "Config.h"
 #include "ConsoleHook.h"
@@ -67,6 +68,8 @@ namespace
 	{
 		if (!a_msg)
 			return;
+		if (a_msg->type == SKSE::MessagingInterface::kPreLoadGame || a_msg->type == SKSE::MessagingInterface::kNewGame)
+			dvb::CameraOrbit::EndSession();  // an orbit never carries into another game
 		if (a_msg->type == SKSE::MessagingInterface::kPreLoadGame)
 			dvb::FreeCamera::BeginLoad();
 		else if (a_msg->type == SKSE::MessagingInterface::kNewGame || a_msg->type == SKSE::MessagingInterface::kPostLoadGame)
@@ -123,6 +126,7 @@ namespace
 				dvb::InstallGameEvents(g_server->Events());
 				dvb::StallWatchdog::Start(g_server->Events(), cfg.stallWatchdogMs);
 				dvb::ConsoleHook::Install(g_server->Events());  // observe console commands as events / for recording
+				dvb::CameraOrbit::Install();                    // camera action='orbit' holds the gameplay camera round the player
 				dvb::ConsoleLogCapture::InstallPrintHook();     // every printed line reaches a console capture
 
 				// Receive cross-plugin interface requests from ANY plugin (nullptr sender),
