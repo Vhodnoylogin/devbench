@@ -182,3 +182,11 @@ add_defines("_WINSOCKAPI_")
 -- the main target so the shared nlohmann_json headers parse identically.
 add_cxflags("/utf-8", "/EHsc", { force = true })
 target_end()
+
+target("devbench-typeinfo-regression")
+set_kind("binary")
+set_default(false)
+add_deps("commonlibsse-ng")
+add_files("typeinfo-regression.cpp")
+add_defines("_WINSOCKAPI_")
+target_end()

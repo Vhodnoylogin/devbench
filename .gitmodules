@@ -1,7 +1,7 @@
 [submodule "lib/commonlibsse-ng"]
 	path = lib/commonlibsse-ng
-	url = https://github.com/alandtse/CommonLibVR.git
-	branch = ng
+	url = https://github.com/Vhodnoylogin/CommonLibSSE-NG.git
+	branch = fix/typeinfo-array-pointer-v125
 [submodule "lib/cpp-mcp"]
 	path = lib/cpp-mcp
 	url = https://github.com/hkr04/cpp-mcp.git
