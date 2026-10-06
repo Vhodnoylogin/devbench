@@ -41,3 +41,10 @@ devbench-typeinfo-regression, then build devbench with deployment disabled
 executor stages/restores the pinned candidate in an isolated run. Generated host
 dependency locks, third-party tools, binary output, credentials and game logs
 stay outside the published source changes. Upstream licensing/credits apply.
+
+The semantic test adapter also needs the actual stack quantity of a loose
+reference. `inspect kind=refs` now includes `quantityItems` from native
+ExtraDataList::GetCount (implicit single item or actual ExtraCount), read in the
+same existing main-thread IdentifyRef task. This is distinct from a container's
+inventory count and from PlaceAtMe's requested quantity. Live qualification of
+that field remains mandatory before certifying a semantic reference observation.

@@ -900,6 +900,9 @@ namespace dvb
 					j["model"] = model->GetModel();
 			}
 			const auto p = a_ref->GetPosition();
+			// Loose-reference stack count, distinct from a container's inventory.
+			// ExtraDataList::GetCount returns the native implicit single item too.
+			j["quantityItems"] = a_ref->extraList.GetCount();
 			j["position"] = json::array({ p.x, p.y, p.z });
 			const auto r = a_ref->GetAngle();
 			j["rotation"] = json::array({ r.x, r.y, r.z });
