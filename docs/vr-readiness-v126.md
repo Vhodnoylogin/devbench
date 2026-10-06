@@ -48,3 +48,13 @@ ExtraDataList::GetCount (implicit single item or actual ExtraCount), read in the
 same existing main-thread IdentifyRef task. This is distinct from a container's
 inventory count and from PlaceAtMe's requested quantity. Live qualification of
 that field remains mandatory before certifying a semantic reference observation.
+
+`menu action=list includeFlags=true` optionally marshals a native UI snapshot to
+the main thread and returns `menuStates` with name, availability, alwaysOpen,
+pausesGame, modal, usesCursor, usesMenuContext and freezeFramePause. Missing menu
+objects remain unavailable; there is no name-based blocking classification or
+fallback on timeout. The default tracked-name list is unchanged. This closes the
+information gap that made the executor refuse WSActivateRollover before Grip.
+Flags are observations, not proof that any particular custom menu accepts input;
+the executor still requires factual physical acquisition and subject assertions.
+Live qualification of the changed binary/flags remains pending.
