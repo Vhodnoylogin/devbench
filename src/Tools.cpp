@@ -1,4 +1,5 @@
 #include "Tools.h"
+#include "RuntimeFixtures.h"
 #include "CameraFrameLogic.h"
 #include "CameraOrbit.h"
 #include <RE/T/ThirdPersonState.h>
@@ -2982,6 +2983,7 @@ namespace dvb
 
 	void RegisterCoreTools(ToolRegistry& a_registry, EventBus& a_events)
 	{
+		RuntimeFixtures::Register(a_registry);
 		RegisterInputTool(a_registry, a_events);
 
 		ToolDescriptor console;
