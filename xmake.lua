@@ -177,6 +177,7 @@ add_files("src/PrologueScan.cpp") -- relocatable-prologue check for the console 
 add_files("src/DifficultyLogic.cpp") -- difficulty level names and parsing; pure logic
 add_files("src/ActorIdleLogic.cpp") -- looping-idle replay gap and due check; pure logic
 add_files("src/CaptureBurstLogic.cpp") -- burst capture request validation and provider event folding; pure logic
+add_files("src/ReachLogic.cpp") -- reach solver, request parsing and frame building; pure logic
 add_files("src/InspectLogic.cpp") -- lights scope/budget/ordering and the handsReady predicate; pure logic
 add_files("src/ReplayTrajectory.cpp") -- pose keyframe sampling/interpolation; pure logic
 add_files("src/RecordingActivity.cpp") -- activity contract + input/trajectory interleave; pure logic
