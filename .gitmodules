@@ -1,7 +1,7 @@
 [submodule "lib/commonlibsse-ng"]
 	path = lib/commonlibsse-ng
 	url = https://github.com/Vhodnoylogin/CommonLibSSE-NG.git
-	branch = fix/autotest-v132-array-decoder
+	branch = fix/typeinfo-array-pointer-modern-se
 [submodule "lib/cpp-mcp"]
 	path = lib/cpp-mcp
 	url = https://github.com/hkr04/cpp-mcp.git
