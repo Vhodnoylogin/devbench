@@ -1,4 +1,5 @@
 #include "Tools.h"
+#include "CurrentMenuState.h"
 #include "ActorIdle.h"
 #include "ActorIdleLogic.h"
 #include "BackgroundRun.h"
@@ -700,6 +701,25 @@ namespace dvb
 			const std::string action = a_args.value("action", std::string("list"));
 
 			if (action == "list") {
+				if (a_args.value("includeFlags", false)) {
+					return MainThread::RunAndWait([]() -> json {
+						json open = json::array(), states = json::array();
+						bool messageBox = false;
+						auto* ui = RE::UI::GetSingleton();
+						for (const auto& name : GetOpenMenus()) {
+							open.push_back(name);
+							messageBox |= name == RE::MessageBoxMenu::MENU_NAME;
+							json state{{ "name", name }, { "available", false }};
+							if (ui) {
+								const auto menu = ui->GetMenu(name);
+								state = CurrentMenuState(name, menu.get());
+							}
+							states.push_back(std::move(state));
+						}
+						return json{{ "openMenus", std::move(open) }, { "menuStates", std::move(states) },
+							{ "messageBoxOpen", messageBox }, { "registered", ToolExtensions::Keys("menu") }};
+					}, std::chrono::milliseconds(5000));
+				}
 				json open = json::array();
 				bool messageBox = false;
 				for (const auto& m : GetOpenMenus()) {
@@ -3131,12 +3151,14 @@ namespace dvb
 				"consumer-registered (mod) menu by 'name' — NOT 'open' (mod menus aren't engine menus). A mod "
 				"exposes its menu via the C-ABI RegisterMenuHandler; 'list' returns those under 'registered'.";
 			menu.description += RegisteredExtensionSummary("menu", "menus (invoke with action='invoke', name=<x>)");
+			menu.description += " list with includeFlags=true reads menuStates with availability and native flags on the game thread; unavailable flags stay absent.";
 			menu.inputSchema = json{
 				{ "type", "object" },
 				{ "properties", json{
 									{ "action", json{ { "type", "string" }, { "enum", json::array({ "list", "describe", "accept", "open", "close", "invoke" }) }, { "description", "list | describe | accept | open | close | invoke" } } },
 									{ "name", json{ { "type", "string" }, { "description", "open/close: ENGINE menu to show/hide (e.g. TweenMenu). invoke/describe: a registered mod menu (see list .registered, or this tool's description)." } } },
 									{ "index", json{ { "type", "integer" }, { "description", "accept: 0-based button index to select (default 0). See describe's buttons/cancelIndex." } } },
+									{ "includeFlags", json{ { "type", "boolean" }, { "description", "list: read native menu states on the main thread (default false)." } } },
 								} },
 			};
 			return menu;

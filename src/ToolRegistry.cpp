@@ -1,4 +1,5 @@
 #include "ToolRegistry.h"
+#include "TextEncoding.h"
 
 namespace dvb
 {
@@ -121,7 +122,7 @@ namespace dvb
 			logs::debug("tool '{}' invoked {}", a_name, args.size() > 160 ? args.substr(0, 160) + "..." : args);
 		}
 		try {
-			auto result = ToolResult::Success(handler(a_args, a_ctx));
+			auto result = ToolResult::Success(NormalizeToolText(handler(a_args, a_ctx)));
 			if (!unknownKeys.empty() && result.value.is_object()) {
 				auto& warnings = result.value["warnings"];
 				if (!warnings.is_array())
