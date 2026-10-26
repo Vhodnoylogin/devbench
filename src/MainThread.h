@@ -38,6 +38,12 @@ namespace dvb::MainThread
 		std::chrono::milliseconds         a_timeout = std::chrono::milliseconds(5000),
 		const std::atomic<bool>*          a_keepWaiting = nullptr);
 
+	/// Same deadline/abandonment fence on SKSE's UI queue for direct movie access.
+	/// Call from a listener thread, never from the UI thread being awaited.
+	json RunUIAndWait(std::function<json()> a_fn,
+		std::chrono::milliseconds a_timeout = std::chrono::milliseconds(5000),
+		const std::atomic<bool>* a_keepWaiting = nullptr);
+
 	/// Engine frame at which the most recently queued main-thread task finished (success or
 	/// throw), or -1 if none has run yet. Lock-free; safe to call from the listener thread.
 	/// Paired with PendingTasks() it distinguishes a busy-but-draining queue from a starved

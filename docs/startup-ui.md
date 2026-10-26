@@ -4,7 +4,7 @@
 argument is `startupOperation`: `snapshot`, `select-new` or `confirm-new`. Arbitrary
 movie paths, method names, input strings and Papyrus scripts are not accepted.
 
-The server marshals to the existing fenced main-thread task primitive, obtains
+The server uses the deadline/abandonment fence on SKSE's UI task queue, obtains
 the actually open Main Menu movie and reads the identified stock
 `_root.MenuHolder.Menu_mc` state, entries and selected entry directly through GFx.
 It does not dispatch a Papyrus callback and can therefore be qualified before
@@ -15,7 +15,7 @@ unknown/missing movie data is unavailable, never fabricated defaults.
 index1. It sets the actual selected position, independently reads back that NEW
 selection and invokes the identified list's item-press method once. `confirm-new`
 requires MainConfirm and the actual selected enabled NEW entry, then invokes its
-native movie acceptance method once. Both are checked within one main-thread task.
+native movie acceptance method once. Both are checked within one UI task.
 Wrong/changed state or selection, duplicate/missing/disabled NEW and unavailable
 UI data refuse mutation. They never confirm Continue, Quit, Load or an arbitrary
 dialog. Other menu operations and registered consumer handlers are unchanged.

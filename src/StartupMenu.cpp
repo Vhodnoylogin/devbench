@@ -51,7 +51,7 @@ json StartupMenu(const json& args)
     const auto operation = args["startupOperation"].get<std::string>();
     if (operation != "snapshot" && operation != "select-new" && operation != "confirm-new")
         throw ToolError(400, "startup operation must be snapshot, select-new or confirm-new");
-    return MainThread::RunAndWait([operation]() -> json {
+    return MainThread::RunUIAndWait([operation]() -> json {
         auto* ui = RE::UI::GetSingleton();
         const auto menu = ui ? ui->GetMenu("Main Menu") : nullptr;
         if (!menu || !menu->uiMovie || !ui->IsMenuOpen("Main Menu"))
