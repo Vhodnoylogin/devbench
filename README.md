@@ -1,5 +1,10 @@
 # devbench
 
+The `fix/native-startup-ui` compatibility branch adds a narrowly guarded native
+main-menu interface usable before the Papyrus VM runs. See
+[startup UI contract](docs/startup-ui.md). Its source tests and build do not
+establish live startup qualification; existing tools retain their behavior.
+
 A standalone SKSE plugin that hosts a **general test bench for Skyrim mod development**:
 an in-process server that exposes mod functionality to **AI agents (MCP)** and to **plain
 HTTP clients (REST)** through one endpoint, on `127.0.0.1`.

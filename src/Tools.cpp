@@ -25,6 +25,7 @@
 #include "Json.h"
 #include "KeyboardInput.h"
 #include "MainThread.h"
+#include "StartupMenu.h"
 #include "Papyrus.h"
 #include "Recording.h"
 #include "ReplayDriver.h"
@@ -699,6 +700,7 @@ namespace dvb
 		json MenuHandler(const json& a_args, const ToolContext& a_ctx)
 		{
 			const std::string action = a_args.value("action", std::string("list"));
+			if (action == "startup") return StartupMenu(a_args);
 
 			if (action == "list") {
 				if (a_args.value("includeFlags", false)) {
@@ -3155,7 +3157,8 @@ namespace dvb
 			menu.inputSchema = json{
 				{ "type", "object" },
 				{ "properties", json{
-									{ "action", json{ { "type", "string" }, { "enum", json::array({ "list", "describe", "accept", "open", "close", "invoke" }) }, { "description", "list | describe | accept | open | close | invoke" } } },
+									{ "action", json{ { "type", "string" }, { "enum", json::array({ "list", "describe", "accept", "open", "close", "invoke", "startup" }) }, { "description", "list | describe | accept | open | close | invoke | startup" } } },
+									{ "startupOperation", json{ { "type", "string" }, { "enum", json::array({ "snapshot", "select-new", "confirm-new" }) }, { "description", "startup only: native main-menu snapshot or guarded single NEW selection/confirmation; no Papyrus VM needed" } } },
 									{ "name", json{ { "type", "string" }, { "description", "open/close: ENGINE menu to show/hide (e.g. TweenMenu). invoke/describe: a registered mod menu (see list .registered, or this tool's description)." } } },
 									{ "index", json{ { "type", "integer" }, { "description", "accept: 0-based button index to select (default 0). See describe's buttons/cancelIndex." } } },
 									{ "includeFlags", json{ { "type", "boolean" }, { "description", "list: read native menu states on the main thread (default false)." } } },
