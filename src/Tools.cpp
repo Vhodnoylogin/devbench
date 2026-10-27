@@ -1,4 +1,7 @@
 #include "Tools.h"
+#include "MorphProvider.h"
+#include "NPCPersistence.h"
+#include "FixtureConfig.h"
 #include "CurrentMenuState.h"
 #include "ActorIdle.h"
 #include "ActorIdleLogic.h"
@@ -3170,6 +3173,9 @@ namespace dvb
 
 	void RegisterCoreTools(ToolRegistry& a_registry, EventBus& a_events)
 	{
+		MorphProvider::Register(a_registry);
+		NPCPersistence::Register(a_registry);
+		FixtureConfig::Register(a_registry);
 		RegisterInputTool(a_registry, a_events);
 
 		ToolDescriptor console;

@@ -1,4 +1,6 @@
 #include "ActorIdle.h"
+#include "MorphProvider.h"
+#include "NPCPersistence.h"
 #include "Autorun.h"
 #include "BackgroundRun.h"
 #include "CameraOrbit.h"
@@ -70,6 +72,8 @@ namespace
 	{
 		if (!a_msg)
 			return;
+		dvb::MorphProvider::OnSKSEMessage(a_msg->type);
+		dvb::NPCPersistence::OnSKSEMessage(a_msg->type);
 		if (a_msg->type == SKSE::MessagingInterface::kPreLoadGame || a_msg->type == SKSE::MessagingInterface::kNewGame)
 			dvb::CameraOrbit::EndSession();  // an orbit never carries into another game
 		if (a_msg->type == SKSE::MessagingInterface::kPreLoadGame || a_msg->type == SKSE::MessagingInterface::kNewGame)
@@ -204,6 +208,7 @@ namespace
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 {
 	SKSE::Init(a_skse);
+	dvb::NPCPersistence::Initialize();
 	InitLogging();
 	SKSE::AllocTrampoline(1 << 10);
 	logs::info("devbench {} loaded", DEVBENCH_VERSION_STRING);

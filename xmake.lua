@@ -120,6 +120,7 @@ remove_files("src/RecordingsMenu.cpp")
 remove_files("src/RecordingsMenuFuck.cpp")
 add_headerfiles("src/**.h")
 add_includedirs("src")
+add_includedirs(os.getenv("AUTOTEST_PROVIDER_API_DIR") or "build/external/provider-api")
 -- Public C-ABI consumer header (DevBenchAPI.h). The companion DevBenchAPI.cpp is
 -- consumer-only and intentionally NOT globbed into this target.
 add_includedirs("include")
