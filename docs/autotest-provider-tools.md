@@ -11,6 +11,16 @@ Polygon must qualify its exact installed DLL composition, native interfaces,
 owned lifecycle and independent gameplay evidence before selecting it for a mod
 order. Previous DevBench qualification does not automatically cover these additions.
 
+The28October source update is authored in Skyrim Autotest commit4b83d7b
+(`native/devbench/`). It adds `npc_persistence` visibility_state/set_visibility
+for persistent dynamic NPCs: exact provider/VM/runtime/cell/world guards,
+one consumed mutation UUID, Disable/Enable(false), and fresh disabled/loaded3D
+observations. Only the external executor's owned creation registry admits targets.
+No inventory reset, deletion or preset mutation occurs. Runtime-handle stability
+across hide/show remains a required live qualification. The morph provider admits
+at most12actors; the external platform retains six unless explicitly opted in.
+The existing six-reference owned save/load contract is unchanged.
+
 | Authored module | Tool | Responsibility |
 | --- | --- | --- |
 | `MorphProvider.cpp/.h` | `morph_provider` | Official OBody API control/catalog and bounded supplementary SKEE fixture-key mutations |
