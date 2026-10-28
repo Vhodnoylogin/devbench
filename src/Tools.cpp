@@ -632,10 +632,6 @@ namespace dvb
 				return out;
 			}
 
-			auto* task = SKSE::GetTaskInterface();
-			if (!task)
-				throw ToolError(500, "SKSE TaskInterface unavailable");
-
 			if (action == "loadLast") {
 				// BGSSaveLoadManager::LoadMostRecentSaveGame() is a silent no-op from the
 				// Main Menu (verified live), so resolve the newest .ess ourselves and load
@@ -646,12 +642,12 @@ namespace dvb
 					throw ToolError(404, std::format("no .ess saves in {}", saveDir.string()));
 				const std::string name = saves.front().name;
 				Recording::NoteLoadEntry(name);  // reproducible entry point for a later recording
-				task->AddTask([name]() {
-					if (auto* m = RE::BGSSaveLoadManager::GetSingleton())
-						m->Load(name.c_str(), false);
-				});
+				// SKSE's native Game.LoadGame requests the load at its sanctioned
+				// event-processing point; a task calling manager.Load can do nothing.
+				json out = Papyrus::QueueCall(json{ { "script", "Game" }, { "function", "LoadGame" }, { "args", json::array({ name }) } });
 				logs::info("devbench: game loadLast -> '{}'", name);
-				return json{ { "queued", true }, { "action", action }, { "name", name }, { "note", kLoadNote } };
+				out.update(json{ { "action", action }, { "name", name }, { "note", kLoadNote }, { "transport", "Papyrus.Game.LoadGame" } });
+				return out;
 			}
 			if (action == "save" || action == "load") {
 				const std::string name = a_args.value("name", std::string{});
@@ -669,20 +665,13 @@ namespace dvb
 						throw ToolError(404, std::format("save '{}' not found in {} — use action='list' for valid names", name, saveDir.string()));
 					Recording::NoteLoadEntry(name);  // reproducible entry point for a later recording
 				}
-				if (isSave) {
-					// SKSE tasks can run on worker threads. Synchronous Save can deadlock
-					// against the main thread's VM lock, so use SKSE's save request.
-					Papyrus::QueueCall(json{ { "script", "Game" }, { "function", "SaveGame" }, { "args", json::array({ name }) } });
-				} else {
-					task->AddTask([name]() {
-						auto* m = RE::BGSSaveLoadManager::GetSingleton();
-						if (!m)
-							return;
-						m->Load(name.c_str(), false);  // checkForMods=false skips the mod-mismatch modal
-					});
-				}
+				// Native Papyrus save/load requests are serviced at SKSE's sanctioned
+				// engine point. Direct manager calls from an arbitrary task may stall
+				// or silently do nothing. Dispatch acceptance is not completion.
+				const char* function = isSave ? "SaveGame" : "LoadGame";
+				json out = Papyrus::QueueCall(json{ { "script", "Game" }, { "function", function }, { "args", json::array({ name }) } });
 				logs::info("devbench: game {} '{}'", action, name);
-				json out{ { "queued", true }, { "action", action }, { "name", name } };
+				out.update(json{ { "action", action }, { "name", name }, { "transport", std::format("Papyrus.Game.{}", function) } });
 				if (!isSave)
 					out["note"] = kLoadNote;
 				return out;
@@ -3225,7 +3214,7 @@ namespace dvb
 			"the save's own .ess header, same bytes the vanilla Load menu shows, so it works even "
 			"before anything has loaded) plus top-level metaAvailable/metaNote if none parsed; "
 			"'loadLast' loads the most recent save (a settled real-game state — avoids coc's "
-			"heavy new-game init); 'load'/'save' take a 'name' ('load' skips the mod-mismatch "
+			"heavy new-game init); 'load'/'save' take a 'name' (a load may require a content-mismatch "
 			"confirmation modal). All but 'list' are fire-and-forget; watch lifecycle events / "
 			"inspect playerLoaded for completion. 'advanceTime' (param 'hours', non-zero, may be "
 			"negative) jumps the calendar directly — no need to fall back to console 'set timescale "
