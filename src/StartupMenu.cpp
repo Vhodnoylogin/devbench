@@ -49,8 +49,9 @@ json StartupMenu(const json& args)
     if (args.size() != 2 || !args.contains("action") || !args.contains("startupOperation") || !args["startupOperation"].is_string())
         throw ToolError(400, "startup requires only action and startupOperation");
     const auto operation = args["startupOperation"].get<std::string>();
-    if (operation != "snapshot" && operation != "select-new" && operation != "confirm-new")
-        throw ToolError(400, "startup operation must be snapshot, select-new or confirm-new");
+    if (operation != "snapshot" && operation != "select-new" && operation != "confirm-new" &&
+        operation != "select-quit" && operation != "confirm-quit")
+        throw ToolError(400, "startup operation must be snapshot, select-new, confirm-new, select-quit or confirm-quit");
     return MainThread::RunUIAndWait([operation]() -> json {
         auto* ui = RE::UI::GetSingleton();
         const auto menu = ui ? ui->GetMenu("Main Menu") : nullptr;
@@ -59,20 +60,25 @@ json StartupMenu(const json& args)
         auto* movie = menu->uiMovie.get();
         auto before = Snapshot(movie);
         if (operation == "snapshot") return before;
-        const auto position = RequireNewEntry(before, operation == "select-new" ? "Main" : "MainConfirm", operation == "confirm-new");
+        const bool selecting = operation == "select-new" || operation == "select-quit";
+        const bool quitting = operation == "select-quit" || operation == "confirm-quit";
+        const auto require = [quitting](const json& snapshot, const std::string& state, bool selected) {
+            return quitting ? RequireQuitEntry(snapshot, state, selected) : RequireNewEntry(snapshot, state, selected);
+        };
+        const auto position = require(before, selecting ? "Main" : "MainConfirm", !selecting);
         RE::GFxValue result;
-        if (operation == "select-new") {
+        if (selecting) {
             if (!movie->SetVariable((std::string(root) + ".MainList.selectedIndex").c_str(), RE::GFxValue(position)))
                 throw ToolError(503, "Startup selection write unavailable");
-            RequireNewEntry(Snapshot(movie), "Main", true);
+            require(Snapshot(movie), "Main", true);
             RE::GFxValue key(0);
             if (!movie->Invoke((std::string(root) + ".MainList.onItemPress").c_str(), &result, &key, 1))
-                throw ToolError(503, "Startup NEW invocation unavailable; do not replay");
+                throw ToolError(503, "Startup requested-item invocation unavailable; do not replay");
         } else if (!movie->Invoke((std::string(root) + ".onAcceptPress").c_str(), &result, nullptr, 0)) {
             throw ToolError(503, "Startup confirmation invocation unavailable; do not replay");
         }
         return json{{"contract", "devbench-startup-ui/1"}, {"operation", operation}, {"completed", true},
-            {"before", before}, {"basis", "identified native movie invocation completed; not a loaded world or SKSE lifecycle proof"}};
+            {"before", before}, {"basis", "identified native movie invocation completed; not a loaded world, SKSE lifecycle or process-exit proof"}};
     });
 }
 }
